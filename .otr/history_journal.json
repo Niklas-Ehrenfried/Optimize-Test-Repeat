@@ -1,0 +1,135 @@
+[
+  {
+    "component_key": "Pipeline Asynchronous H2D Streaming::Medium",
+    "run_name": "baseline",
+    "notes": "initial baseline",
+    "metrics": {
+      "latency_ms": 0.5,
+      "forward_latency_ms": 0.5,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 8.0,
+      "vram_transient_forward_mb": 24.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 24.0,
+      "compute_ratio_pct": 87.2,
+      "memory_transfer_pct": 12.8,
+      "gpu_idle_overhead_pct": 0.0,
+      "generation": "GEN_0"
+    }
+  },
+  {
+    "component_key": "Pipeline Asynchronous H2D Streaming::Medium",
+    "run_name": "fused_stages",
+    "notes": "fused memory stage bounds",
+    "metrics": {
+      "latency_ms": 0.45,
+      "forward_latency_ms": 0.45,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 8.0,
+      "vram_transient_forward_mb": 24.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 24.0,
+      "compute_ratio_pct": 87.2,
+      "memory_transfer_pct": 12.8,
+      "gpu_idle_overhead_pct": 0.0,
+      "generation": "GEN_1"
+    }
+  },
+  {
+    "component_key": "Pipeline Asynchronous H2D Streaming::Medium",
+    "run_name": "vectorized_v2",
+    "notes": "vectorized kernel compilation",
+    "metrics": {
+      "latency_ms": 0.4,
+      "forward_latency_ms": 0.4,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 8.0,
+      "vram_transient_forward_mb": 24.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 24.0,
+      "compute_ratio_pct": 87.2,
+      "memory_transfer_pct": 12.8,
+      "gpu_idle_overhead_pct": 0.0,
+      "generation": "GEN_2"
+    }
+  },
+  {
+    "component_key": "Pipeline Asynchronous H2D Streaming::Large",
+    "run_name": "baseline",
+    "notes": "initial baseline",
+    "metrics": {
+      "latency_ms": 2.7,
+      "forward_latency_ms": 2.7,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 64.0,
+      "vram_transient_forward_mb": 192.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 192.0,
+      "compute_ratio_pct": 84.7,
+      "memory_transfer_pct": 15.3,
+      "gpu_idle_overhead_pct": 0.0,
+      "generation": "GEN_0"
+    }
+  },
+  {
+    "component_key": "Pipeline Asynchronous H2D Streaming::Large",
+    "run_name": "sweep_name",
+    "notes": "notes here",
+    "metrics": {
+      "latency_ms": 2.690976799931377,
+      "forward_latency_ms": 2.690976799931377,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 64.0,
+      "vram_transient_forward_mb": 192.00146484375,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 192.00146484375,
+      "compute_ratio_pct": 84.67692685953111,
+      "memory_transfer_pct": 15.323073140468892,
+      "gpu_idle_overhead_pct": 0.0,
+      "generation": "GEN_1"
+    }
+  },
+  {
+    "component_key": "Pipeline Asynchronous H2D Streaming::Ultra",
+    "run_name": "sweep_name",
+    "notes": "notes here",
+    "metrics": {
+      "latency_ms": 22.69687599982717,
+      "forward_latency_ms": 22.69687599982717,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 512.0,
+      "vram_transient_forward_mb": 1536.00146484375,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 1536.00146484375,
+      "compute_ratio_pct": 85.29419314805214,
+      "memory_transfer_pct": 14.705806851947855,
+      "gpu_idle_overhead_pct": 0.0,
+      "generation": "GEN_0"
+    }
+  },
+  {
+    "component_key": "Refinements Unified Telemetry::Small",
+    "run_name": "test_run",
+    "notes": "testing",
+    "metrics": {
+      "latency_ms": 0.082,
+      "forward_latency_ms": 0.012,
+      "backward_latency_ms": 0.07,
+      "requires_backward": true,
+      "vram_base_mb": 108.22,
+      "vram_transient_forward_mb": 0.062,
+      "vram_transient_backward_mb": 0.204,
+      "vram_transient_mb": 0.204,
+      "compute_ratio_pct": 95.04,
+      "memory_transfer_pct": 4.96,
+      "gpu_idle_overhead_pct": 0.0,
+      "generation": "GEN_0"
+    }
+  }
+]
