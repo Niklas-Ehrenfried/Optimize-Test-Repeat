@@ -8,22 +8,26 @@ Manages persistent database states for OTR benchmarks, including:
 
 Coordinates promotion prompts, workspace cleanup, and Git commit integrations.
 """
+
 import os
 import json
 import subprocess
 import sys
 from typing import Dict, List, Set, Any, Optional, Union
 
+
 class OTRStateManager:
     """
     State manager for tracking and updating OTR state files. Handles evaluating
-    telemetry records, archiving promotion candidates, workspace pruning, and 
+    telemetry records, archiving promotion candidates, workspace pruning, and
     automated or interactive Git commits.
     """
-    
+
     # Session tracking caches
     pending_promotions: List[Dict[str, Any]] = []
-    session_profiled_components: Dict[str, Set[str]] = {}  # component_id -> set(profile_sizes)
+    session_profiled_components: Dict[
+        str, Set[str]
+    ] = {}  # component_id -> set(profile_sizes)
 
     def __init__(self, base_dir: str = ".otr") -> None:
         """
@@ -32,6 +36,10 @@ class OTRStateManager:
         Args:
             base_dir (str): Base directory storing OTR state JSON files.
         """
+        self.base_dir = base_dir
+        os.makedirs(
+            base_dir, exist_ok=True
+        )  # Fix: Ensure the directory directory layer exists safely
         self.best_path: str = os.path.join(base_dir, "g_best.json")
         self.workspace_path: str = os.path.join(base_dir, "intra_gen_workspace.json")
         self.journal_path: str = os.path.join(base_dir, "history_journal.json")
@@ -73,7 +81,7 @@ class OTRStateManager:
         run_name: str,
         notes: str,
         metrics: Dict[str, Any],
-        test_only: bool = False
+        test_only: bool = False,
     ) -> str:
         """
         Evaluates a new benchmark execution.
@@ -84,17 +92,6 @@ class OTRStateManager:
         3. Determining whether the execution is an improvement over the current baseline in g_best.json.
         4. Staging the run inside the local workspace (intra_gen_workspace.json).
         5. Registering promotion candidates for final session approval when applicable.
-
-        Args:
-            component (str): The component name/ID.
-            profile_size (str): Target profile size (e.g. "Small").
-            run_name (str): Identifier tag for this experiment execution.
-            notes (str): Detailed commentary notes for the run.
-            metrics (dict): Unrounded telemetry metrics.
-            test_only (bool): If True, skips staging the run for generation advancement.
-
-        Returns:
-            str: Trial outcome status ("FAILED", "IMPROVED_INTRA", or "REJECTED").
         """
         if component not in OTRStateManager.session_profiled_components:
             OTRStateManager.session_profiled_components[component] = set()
@@ -120,7 +117,7 @@ class OTRStateManager:
             "vram_transient_mb": vram_dec,
             "compute_ratio_pct": pct_dec,
             "memory_transfer_pct": pct_dec,
-            "gpu_idle_overhead_pct": pct_dec
+            "gpu_idle_overhead_pct": pct_dec,
         }
 
         for k, dec in key_mapping.items():
@@ -138,23 +135,25 @@ class OTRStateManager:
             t_key: str = f"{t_comp}::{t_prof}"
             t_best: Optional[Dict[str, Any]] = g_best.get(t_key)
             t_best_gen: str = t_best.get("generation", "GEN_0") if t_best else "GEN_0"
-            
+
             try:
                 t_gen_num: int = int(t.get("generation_context", "GEN_0").split("_")[1])
                 best_gen_num: int = int(t_best_gen.split("_")[1])
             except (IndexError, ValueError):
                 t_gen_num = 0
                 best_gen_num = 0
-                
+
             if t_gen_num < best_gen_num:
                 components_to_purge.add(t_comp)
 
         if components_to_purge:
-            workspace = [t for t in workspace if t.get("component") not in components_to_purge]
+            workspace = [
+                t for t in workspace if t.get("component") not in components_to_purge
+            ]
 
         feature_key: str = f"{component}::{profile_size}"
         best_record: Optional[Dict[str, Any]] = g_best.get(feature_key, None)
-        
+
         current_latency: float = metrics.get("latency_ms", -1.0)
         is_candidate: bool = False
         proposed_gen: str = "GEN_0"
@@ -191,52 +190,49 @@ class OTRStateManager:
             "profile_size": profile_size,
             "run_name": run_name,
             "notes": notes,
-            "generation_context": best_record.get("generation", "GEN_0") if best_record else "GEN_0",
-            "metrics": clean_metrics
+            "generation_context": best_record.get("generation", "GEN_0")
+            if best_record
+            else "GEN_0",
+            "metrics": clean_metrics,
         }
 
         # Track candidate status in memory for session finish processing
         if is_candidate:
-            OTRStateManager.pending_promotions.append({
-                "component": component,
-                "profile_size": profile_size,
-                "run_name": run_name,
-                "notes": notes,
-                "metrics": clean_metrics,
-                "best_record": best_record,
-                "proposed_gen_str": proposed_gen
-            })
+            OTRStateManager.pending_promotions.append(
+                {
+                    "component": component,
+                    "profile_size": profile_size,
+                    "run_name": run_name,
+                    "notes": notes,
+                    "metrics": clean_metrics,
+                    "best_record": best_record,
+                    "proposed_gen_str": proposed_gen,
+                }
+            )
 
         # CRITICAL: Clean Deduplication. Overwrite matching run names in place.
         replaced: bool = False
         for i, entry in enumerate(workspace):
-            if (entry.get("component") == component and 
-                entry.get("profile_size") == profile_size and 
-                entry.get("run_name") == run_name):
+            if (
+                entry.get("component") == component
+                and entry.get("profile_size") == profile_size
+                and entry.get("run_name") == run_name
+            ):
                 workspace[i] = run_entry
                 replaced = True
                 break
-        
+
         if not replaced:
             workspace.append(run_entry)
-            
+
         self._save(self.workspace_path, workspace)
         return status
 
-    def process_pending_promotions(self, no_stage: bool = False, test_only: bool = False) -> None:
+    def process_pending_promotions(
+        self, no_stage: bool = False, test_only: bool = False
+    ) -> None:
         """
         Interates through all pending promotions collected during the session.
-
-        - If running in an interactive terminal, prompts the user for confirmation.
-        - If headless (CI / Agentic execution), automatically confirms the promotion.
-        - Promotes confirmed candidates to g_best.json.
-        - Appends records to history_journal.json (historical milestones).
-        - Purges the workspace of all entries belonging to the promoted component.
-        - Triggers Git staging for all promoted metrics and source code when enabled.
-
-        Args:
-            no_stage (bool): If True, updates local JSON files but skips Git staging.
-            test_only (bool): If True, bypasses all updates/staging entirely.
         """
         if test_only or not OTRStateManager.pending_promotions:
             return
@@ -258,18 +254,24 @@ class OTRStateManager:
             promotion_confirmed: bool
             if sys.stdin.isatty():
                 if best_record is None:
-                    print(f"\n[OTR] Milestone reached: {proposed_gen_str} baseline initialized for {component} ({profile_size})!")
+                    print(
+                        f"\n[OTR] Milestone reached: {proposed_gen_str} baseline initialized for {component} ({profile_size})!"
+                    )
                     prompt = "Confirm baseline promotion? (y/n) [y]: "
                 else:
-                    print(f"\n[OTR] Milestone reached: Improvement detected for {component} ({profile_size})!")
-                    print(f"      Latency: {best_record['latency_ms']:.2f}ms -> {metrics['latency_ms']:.2f}ms")
+                    print(
+                        f"\n[OTR] Milestone reached: Improvement detected for {component} ({profile_size})!"
+                    )
+                    print(
+                        f"      Latency: {best_record['latency_ms']:.2f}ms -> {metrics['latency_ms']:.2f}ms"
+                    )
                     prompt = f"Advance workspace to milestone generation {proposed_gen_str}? (y/n) [y]: "
-                
+
                 try:
                     sys.stdout.write(prompt)
                     sys.stdout.flush()
                     ans: str = sys.stdin.readline().strip().lower()
-                    promotion_confirmed = (ans != "n")
+                    promotion_confirmed = ans != "n"
                 except Exception:
                     promotion_confirmed = True
             else:
@@ -289,37 +291,46 @@ class OTRStateManager:
                 self._save(self.best_path, g_best)
 
                 # Migration: Write ONLY this single successful run into the historical journal
-                # Make sure the journal's metrics doesn't contain duplicate fields
                 journal_metrics: Dict[str, Any] = dict(metrics)
                 for k in ["status", "outcome", "run_name", "notes", "generation"]:
                     journal_metrics.pop(k, None)
                 journal_metrics["generation"] = proposed_gen_str
 
-                journal.append({
-                    "component_key": feature_key,
-                    "run_name": run_name,
-                    "notes": notes,
-                    "metrics": journal_metrics
-                })
+                journal.append(
+                    {
+                        "component_key": feature_key,
+                        "run_name": run_name,
+                        "notes": notes,
+                        "metrics": journal_metrics,
+                    }
+                )
                 self._save(self.journal_path, journal)
 
                 # Clean up the scratchpad workspace for this entire feature sequence
-                workspace_data: List[Dict[str, Any]] = self._load(self.workspace_path, list)
-                workspace_data = [t for t in workspace_data if t.get("component") != component]
+                workspace_data: List[Dict[str, Any]] = self._load(
+                    self.workspace_path, list
+                )
+                workspace_data = [
+                    t for t in workspace_data if t.get("component") != component
+                ]
                 self._save(self.workspace_path, workspace_data)
 
-                confirmed_promos.append({
-                    "component": component,
-                    "profile_size": profile_size,
-                    "run_name": run_name,
-                    "target_gen": proposed_gen_str,
-                    "latency": metrics["latency_ms"],
-                    "vram": metrics.get("vram_transient_mb", 0.0)
-                })
+                confirmed_promos.append(
+                    {
+                        "component": component,
+                        "profile_size": profile_size,
+                        "run_name": run_name,
+                        "target_gen": proposed_gen_str,
+                        "latency": metrics["latency_ms"],
+                        "vram": metrics.get("vram_transient_mb", 0.0),
+                    }
+                )
 
         if confirmed_promos:
             if no_stage:
-                print(f"\n[OTR] {len(confirmed_promos)} milestones advanced in configurations. (Git staging skipped via flag)")
+                print(
+                    f"\n[OTR] {len(confirmed_promos)} milestones advanced in configurations. (Git staging skipped via flag)"
+                )
             else:
                 self._git_stage_all_promotions(confirmed_promos)
 
@@ -328,14 +339,6 @@ class OTRStateManager:
     def _git_stage_all_promotions(self, confirmed_promos: List[Dict[str, Any]]) -> None:
         """
         Stages newly promoted milestone files in Git.
-
-        - Scans current `git status --porcelain` to identify changed files.
-        - If interactive: prompts the user to select specific files (indices, all, none) to stage.
-        - If headless (agent/CI): stages only OTR configurations and test files (.otr/* and tests/*)
-          as a safety boundary, preventing accidental staging of unrelated files.
-
-        Args:
-            confirmed_promos (list): A list of dictionaries representing confirmed promotions.
         """
         if not confirmed_promos:
             return
@@ -345,15 +348,21 @@ class OTRStateManager:
             p: Dict[str, Any] = confirmed_promos[0]
             msg = f"OTR Milestone: {p['target_gen']} [{p['component']} | {p['profile_size']}] -> '{p['run_name']}' | Latency: {p['latency']:.2f}ms | Transient VRAM: {p['vram']:.2f}MB"
         else:
-            msg = f"OTR Milestone: Multiple Promotions ({len(confirmed_promos)} features updated)\n\n" + "\n".join(
-                f"- {p['target_gen']} [{p['component']} | {p['profile_size']}] -> '{p['run_name']}' | Latency: {p['latency']:.2f}ms | Transient VRAM: {p['vram']:.2f}MB"
-                for p in confirmed_promos
+            msg = (
+                f"OTR Milestone: Multiple Promotions ({len(confirmed_promos)} features updated)\n\n"
+                + "\n".join(
+                    f"- {p['target_gen']} [{p['component']} | {p['profile_size']}] -> '{p['run_name']}' | Latency: {p['latency']:.2f}ms | Transient VRAM: {p['vram']:.2f}MB"
+                    for p in confirmed_promos
+                )
             )
 
         changed_files: List[str] = []
         try:
             res: subprocess.CompletedProcess[str] = subprocess.run(
-                ["git", "status", "--porcelain"], capture_output=True, text=True, check=True
+                ["git", "status", "--porcelain"],
+                capture_output=True,
+                text=True,
+                check=True,
             )
             for line in res.stdout.splitlines():
                 if len(line) >= 4:
@@ -374,21 +383,29 @@ class OTRStateManager:
                     print(f"  [{idx}] {f}")
                 print("  [a] All files")
                 print("  [n] None (metrics only)")
-                
-                sys.stdout.write("Select files to stage (comma-separated indices, 'a', or 'n') [a]: ")
+
+                sys.stdout.write(
+                    "Select files to stage (comma-separated indices, 'a', or 'n') [a]: "
+                )
                 sys.stdout.flush()
                 selection: str = sys.stdin.readline().strip().lower()
                 if not selection:
                     selection = "a"
-                
+
                 if selection == "a":
                     selected_files = changed_files
                 elif selection == "n":
                     selected_files = []
                 else:
                     try:
-                        indices: List[int] = [int(i.strip()) for i in selection.split(",")]
-                        selected_files = [changed_files[i] for i in indices if 0 <= i < len(changed_files)]
+                        indices: List[int] = [
+                            int(i.strip()) for i in selection.split(",")
+                        ]
+                        selected_files = [
+                            changed_files[i]
+                            for i in indices
+                            if 0 <= i < len(changed_files)
+                        ]
                     except ValueError:
                         selected_files = changed_files
             else:
@@ -398,18 +415,22 @@ class OTRStateManager:
             selected_files = [f for f in changed_files if ".otr/" in f or "tests/" in f]
 
         try:
-            subprocess.run(["git", "add", self.best_path, self.journal_path, self.workspace_path], check=True)
+            subprocess.run(
+                ["git", "add", self.best_path, self.journal_path, self.workspace_path],
+                check=True,
+            )
             for f in selected_files:
                 if os.path.exists(f):
                     try:
                         subprocess.run(["git", "add", f], check=True)
                     except subprocess.CalledProcessError:
                         try:
-                            # Try force adding if the file is tracked-but-ignored
                             subprocess.run(["git", "add", "-f", f], check=True)
                         except subprocess.CalledProcessError:
                             pass
-            print(f"\n[OTR] Staged milestone changes in Git. Run 'git commit' to commit them.")
+            print(
+                f"\n[OTR] Staged milestone changes in Git. Run 'git commit' to commit them."
+            )
             print(f"Suggested commit message:\n{msg}")
         except subprocess.CalledProcessError as e:
             print(f"[OTR] Warning: Git staging failed: {e}")

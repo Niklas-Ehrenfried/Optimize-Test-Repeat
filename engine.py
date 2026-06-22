@@ -1,10 +1,11 @@
 """
 OTR Profiler Engine Module.
 
-Provides deep execution profiling capabilities, including latency measurement, 
+Provides deep execution profiling capabilities, including latency measurement,
 transient VRAM tracking, and low-level hardware operation bounds profiles. Supports
 both native Python execution paths and PyTorch/CUDA-driven deep learning models.
 """
+
 import time
 import gc
 import sys
@@ -72,7 +73,9 @@ class OTRProfilerEngine:
         return tensors
 
     @staticmethod
-    def _fwd_bwd_wrapper(f: Callable[..., Any], inp: Union[Tuple[Any, ...], List[Any]]) -> None:
+    def _fwd_bwd_wrapper(
+        f: Callable[..., Any], inp: Union[Tuple[Any, ...], List[Any]]
+    ) -> None:
         """
         Executes both the forward and backward passes of a function. Computes a dummy
         scalar loss by summing all gradient-requiring outputs and backpropagating.
@@ -104,7 +107,7 @@ class OTRProfilerEngine:
             return False
         if visited is None:
             visited = set()
-        
+
         obj_id = id(x)
         if obj_id in visited:
             return False
@@ -115,9 +118,14 @@ class OTRProfilerEngine:
         if isinstance(x, (list, tuple)):
             return any(OTRProfilerEngine._has_tensors(item, visited) for item in x)
         if isinstance(x, dict):
-            return any(OTRProfilerEngine._has_tensors(item, visited) for item in x.values())
+            return any(
+                OTRProfilerEngine._has_tensors(item, visited) for item in x.values()
+            )
         if hasattr(x, "__dict__"):
-            return any(OTRProfilerEngine._has_tensors(val, visited) for val in x.__dict__.values())
+            return any(
+                OTRProfilerEngine._has_tensors(val, visited)
+                for val in x.__dict__.values()
+            )
         return False
 
     @staticmethod
@@ -134,15 +142,6 @@ class OTRProfilerEngine:
         - For standard algorithms: profiles cleanly using time.perf_counter without PyTorch overhead.
         - For ML models: profiles forward/backward passes, records GPU transient VRAM usage, and
           uses PyTorch's execution profiler to estimate compute ratio vs memory transfer bottlenecks.
-
-        Args:
-            func (callable): The benchmark target function.
-            inputs (tuple/list): Function arguments.
-            num_iter (int): Number of iterations to run during low-level operations profiling.
-            require_backward (bool, optional): Force backward pass profiling.
-
-        Returns:
-            dict: Telemetry metrics including latency, VRAM footprint, and hardware bounds.
         """
         global torch
         if torch is None:
@@ -184,20 +183,26 @@ class OTRProfilerEngine:
             from torch.profiler import profile, ProfilerActivity, record_function
             import torch.utils.benchmark as benchmark
 
-            warmup_out = func(*inputs)
+            # Initial lightweight pass to safely determine backward graph requirement
+            first_out = func(*inputs)
             requires_bwd = (
                 require_backward
                 if require_backward is not None
-                else len(OTRProfilerEngine._find_tensors_requiring_grad(warmup_out)) > 0
+                else len(OTRProfilerEngine._find_tensors_requiring_grad(first_out)) > 0
             )
 
-            # Pre-populate grads for memory initialization stability
-            if requires_bwd:
-                grad_tensors = OTRProfilerEngine._find_tensors_requiring_grad(
-                    warmup_out
-                )
-                if grad_tensors:
-                    sum(t.sum() for t in grad_tensors).backward()
+            # ENHANCED WARMUP: Complete a sequence of passes to guarantee full JIT / Triton kernel compilation
+            is_compiled = (
+                hasattr(func, "_compiled_callable")
+                or "OptimizedModule" in type(func).__name__
+            )
+            warmup_iters = 3 if is_compiled else 1
+
+            for _ in range(warmup_iters):
+                if requires_bwd:
+                    OTRProfilerEngine._fwd_bwd_wrapper(func, inputs)
+                else:
+                    _ = func(*inputs)
 
             # Clean cache and sync before profiling base memory
             if torch.cuda.is_available():
@@ -315,11 +320,14 @@ class OTRProfilerEngine:
                     "gather",
                     "index",
                     "scatter",
+                    "triton_poi",
+                    "triton_red",
+                    "extern_copy",
                 ]
                 transfer_time = sum(
                     OTRProfilerEngine._get_device_time(op)
                     for op in averages
-                    if any(m in op.key for m in mem_sigs)
+                    if any(m in op.key.lower() for m in mem_sigs)
                 )
                 runtime_stalls = sum(
                     op.cpu_time_total
@@ -346,11 +354,14 @@ class OTRProfilerEngine:
                     "gather",
                     "index",
                     "scatter",
+                    "triton_poi",
+                    "triton_red",
+                    "extern_copy",
                 ]
                 transfer_time = sum(
                     op.cpu_time_total
                     for op in averages
-                    if any(m in op.key for m in mem_sigs)
+                    if any(m in op.key.lower() for m in mem_sigs)
                 )
                 metrics["compute_ratio_pct"] = (
                     max(total_cpu_time - transfer_time, 0.0) / max(total_cpu_time, 1e-5)
@@ -364,7 +375,7 @@ class OTRProfilerEngine:
 
             # Aggressive cleanup of local references to prevent memory accumulation and OOM
             try:
-                del warmup_out
+                del first_out
             except NameError:
                 pass
             try:

@@ -1,0 +1,454 @@
+[
+  {
+    "component": "LLM Architecture Compiled Gated MLP",
+    "profile_size": "Small",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": -1.0,
+      "forward_latency_ms": -1.0,
+      "backward_latency_ms": -1.0,
+      "vram_base_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "compute_ratio_pct": 0.0,
+      "memory_transfer_pct": 0.0,
+      "gpu_idle_overhead_pct": 0.0,
+      "requires_backward": false,
+      "status": "FAILED",
+      "error": "AttributeError: module 'torch' has no attribute 'silu'"
+    }
+  },
+  {
+    "component": "test_compiled_mlp_telemetry[Small]",
+    "profile_size": "Small",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": -1.0,
+      "forward_latency_ms": -1.0,
+      "backward_latency_ms": -1.0,
+      "vram_base_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "compute_ratio_pct": 0.0,
+      "memory_transfer_pct": 0.0,
+      "gpu_idle_overhead_pct": 0.0,
+      "requires_backward": false,
+      "status": "FAILED",
+      "error": "AssertionError: assert 'FAILED' != 'FAILED'"
+    }
+  },
+  {
+    "component": "LLM Architecture Compiled Gated MLP",
+    "profile_size": "Medium",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": -1.0,
+      "forward_latency_ms": -1.0,
+      "backward_latency_ms": -1.0,
+      "vram_base_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "compute_ratio_pct": 0.0,
+      "memory_transfer_pct": 0.0,
+      "gpu_idle_overhead_pct": 0.0,
+      "requires_backward": false,
+      "status": "FAILED",
+      "error": "AttributeError: module 'torch' has no attribute 'silu'"
+    }
+  },
+  {
+    "component": "test_compiled_mlp_telemetry[Medium]",
+    "profile_size": "Medium",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": -1.0,
+      "forward_latency_ms": -1.0,
+      "backward_latency_ms": -1.0,
+      "vram_base_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "compute_ratio_pct": 0.0,
+      "memory_transfer_pct": 0.0,
+      "gpu_idle_overhead_pct": 0.0,
+      "requires_backward": false,
+      "status": "FAILED",
+      "error": "AssertionError: assert 'FAILED' != 'FAILED'"
+    }
+  },
+  {
+    "component": "Pipeline Asynchronous H2D Streaming",
+    "profile_size": "Medium",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 3.013,
+      "forward_latency_ms": 3.013,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 99.92,
+      "memory_transfer_pct": 0.08,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "Pipeline Asynchronous H2D Streaming",
+    "profile_size": "Large",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 29.063,
+      "forward_latency_ms": 29.063,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 99.98,
+      "memory_transfer_pct": 0.02,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "Pipeline Asynchronous H2D Streaming",
+    "profile_size": "Ultra",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 242.472,
+      "forward_latency_ms": 242.472,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 100.0,
+      "memory_transfer_pct": 0.0,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "LLM Token Generation Top-P Sampling",
+    "profile_size": "Custom",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 9.568,
+      "forward_latency_ms": 9.568,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 97.3,
+      "memory_transfer_pct": 2.7,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "LLM Inference KV-Cache Splicing",
+    "profile_size": "Small",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 0.13,
+      "forward_latency_ms": 0.13,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 98.88,
+      "memory_transfer_pct": 1.12,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "LLM Inference KV-Cache Splicing",
+    "profile_size": "Medium",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 0.295,
+      "forward_latency_ms": 0.295,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 99.72,
+      "memory_transfer_pct": 0.28,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "LLM Inference KV-Cache Splicing",
+    "profile_size": "Large",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 7.791,
+      "forward_latency_ms": 7.791,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 99.85,
+      "memory_transfer_pct": 0.15,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "Refinements Unified Telemetry",
+    "profile_size": "Small",
+    "run_name": "test_all",
+    "notes": "Initial test for all features",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": -1.0,
+      "forward_latency_ms": -1.0,
+      "backward_latency_ms": -1.0,
+      "vram_base_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "compute_ratio_pct": 0.0,
+      "memory_transfer_pct": 0.0,
+      "gpu_idle_overhead_pct": 0.0,
+      "requires_backward": false,
+      "status": "FAILED",
+      "error": "ValueError: Simulated OOM or Shape Mismatch"
+    }
+  },
+  {
+    "component": "LLM Architecture Compiled Gated MLP",
+    "profile_size": "Small",
+    "run_name": "g",
+    "notes": "gg",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 0.571,
+      "forward_latency_ms": 0.191,
+      "backward_latency_ms": 0.38,
+      "requires_backward": true,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 97.77,
+      "memory_transfer_pct": 2.23,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "LLM Architecture Compiled Gated MLP",
+    "profile_size": "Medium",
+    "run_name": "g",
+    "notes": "gg",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 6.352,
+      "forward_latency_ms": 1.847,
+      "backward_latency_ms": 4.505,
+      "requires_backward": true,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 98.32,
+      "memory_transfer_pct": 1.68,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "Pipeline Asynchronous H2D Streaming",
+    "profile_size": "Medium",
+    "run_name": "g",
+    "notes": "gg",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 3.044,
+      "forward_latency_ms": 3.044,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 99.95,
+      "memory_transfer_pct": 0.05,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "Pipeline Asynchronous H2D Streaming",
+    "profile_size": "Large",
+    "run_name": "g",
+    "notes": "gg",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 30.638,
+      "forward_latency_ms": 30.638,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 99.98,
+      "memory_transfer_pct": 0.02,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "Pipeline Asynchronous H2D Streaming",
+    "profile_size": "Ultra",
+    "run_name": "g",
+    "notes": "gg",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 242.503,
+      "forward_latency_ms": 242.503,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 100.0,
+      "memory_transfer_pct": 0.0,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "LLM Token Generation Top-P Sampling",
+    "profile_size": "Custom",
+    "run_name": "g",
+    "notes": "gg",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 9.546,
+      "forward_latency_ms": 9.546,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 97.35,
+      "memory_transfer_pct": 2.65,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "LLM Inference KV-Cache Splicing",
+    "profile_size": "Small",
+    "run_name": "g",
+    "notes": "gg",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 0.151,
+      "forward_latency_ms": 0.151,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 98.45,
+      "memory_transfer_pct": 1.55,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "LLM Inference KV-Cache Splicing",
+    "profile_size": "Medium",
+    "run_name": "g",
+    "notes": "gg",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 0.28,
+      "forward_latency_ms": 0.28,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 99.71,
+      "memory_transfer_pct": 0.29,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "LLM Inference KV-Cache Splicing",
+    "profile_size": "Large",
+    "run_name": "g",
+    "notes": "gg",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": 8.029,
+      "forward_latency_ms": 8.029,
+      "backward_latency_ms": 0.0,
+      "requires_backward": false,
+      "vram_base_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "compute_ratio_pct": 99.86,
+      "memory_transfer_pct": 0.14,
+      "gpu_idle_overhead_pct": 0.0
+    }
+  },
+  {
+    "component": "Refinements Unified Telemetry",
+    "profile_size": "Small",
+    "run_name": "g",
+    "notes": "gg",
+    "generation_context": "GEN_0",
+    "metrics": {
+      "latency_ms": -1.0,
+      "forward_latency_ms": -1.0,
+      "backward_latency_ms": -1.0,
+      "vram_base_mb": 0.0,
+      "vram_transient_mb": 0.0,
+      "vram_transient_forward_mb": 0.0,
+      "vram_transient_backward_mb": 0.0,
+      "compute_ratio_pct": 0.0,
+      "memory_transfer_pct": 0.0,
+      "gpu_idle_overhead_pct": 0.0,
+      "requires_backward": false,
+      "status": "FAILED",
+      "error": "ValueError: Simulated OOM or Shape Mismatch"
+    }
+  }
+]
