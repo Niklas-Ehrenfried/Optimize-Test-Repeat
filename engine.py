@@ -361,9 +361,44 @@ class OTRProfilerEngine:
                 metrics["gpu_idle_overhead_pct"] = 0.0
 
             metrics["status"] = "SUCCESS"
+
+            # Aggressive cleanup of local references to prevent memory accumulation and OOM
+            try:
+                del warmup_out
+            except NameError:
+                pass
+            try:
+                del out
+            except NameError:
+                pass
+            try:
+                del grad_tensors
+            except NameError:
+                pass
+            try:
+                del prof
+            except NameError:
+                pass
+            try:
+                del averages
+            except NameError:
+                pass
+
+            gc.collect()
+            if torch is not None and torch.cuda.is_available():
+                torch.cuda.synchronize()
+                torch.cuda.empty_cache()
+
             return metrics
 
         except Exception as e:
+            gc.collect()
+            if torch is not None and torch.cuda.is_available():
+                try:
+                    torch.cuda.synchronize()
+                    torch.cuda.empty_cache()
+                except Exception:
+                    pass
             return {
                 "latency_ms": -1.0,
                 "forward_latency_ms": -1.0,

@@ -67,7 +67,8 @@ class OTRReporter:
     def render_dashboard(
         active_component: str,
         active_profiles: Optional[List[str]] = None,
-        list_milestones: bool = False
+        list_milestones: bool = False,
+        base_dir: str = ".otr"
     ) -> None:
         """
         Renders the Consolidation Dashboard Table for a specific feature component.
@@ -81,9 +82,10 @@ class OTRReporter:
             active_component (str): The name/ID of the component to render.
             active_profiles (list, optional): Filter to only show these profile sizes.
             list_milestones (bool): Show full historical generation milestone rows.
+            base_dir (str): Base directory storing OTR state JSON files.
         """
         console = Console()
-        state_mgr = OTRStateManager()
+        state_mgr = OTRStateManager(base_dir=base_dir)
         
         g_best: Dict[str, Any] = state_mgr._load(state_mgr.best_path, dict)
         workspace: List[Dict[str, Any]] = state_mgr._load(state_mgr.workspace_path, list)

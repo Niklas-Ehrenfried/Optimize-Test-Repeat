@@ -265,10 +265,13 @@ class OTRStateManager:
                     print(f"      Latency: {best_record['latency_ms']:.2f}ms -> {metrics['latency_ms']:.2f}ms")
                     prompt = f"Advance workspace to milestone generation {proposed_gen_str}? (y/n) [y]: "
                 
-                sys.stdout.write(prompt)
-                sys.stdout.flush()
-                ans: str = sys.stdin.readline().strip().lower()
-                promotion_confirmed = (ans != "n")
+                try:
+                    sys.stdout.write(prompt)
+                    sys.stdout.flush()
+                    ans: str = sys.stdin.readline().strip().lower()
+                    promotion_confirmed = (ans != "n")
+                except Exception:
+                    promotion_confirmed = True
             else:
                 promotion_confirmed = True
 
@@ -392,7 +395,7 @@ class OTRStateManager:
                 print("\nNo changed files detected in git status.")
         else:
             # Headless Agent Security Mode: Only stage metrics and tests to prevent codebase pollution
-            selected_files = [f for f in changed_files if f.startswith(".otr/") or f.startswith("tests/")]
+            selected_files = [f for f in changed_files if ".otr/" in f or "tests/" in f]
 
         try:
             subprocess.run(["git", "add", self.best_path, self.journal_path, self.workspace_path], check=True)

@@ -1,1 +1,18 @@
-pyproject-rocm.toml
+[project]
+name = "otr-framework"
+version = "1.0.0"
+description = "Optimize Test Repeat - Universal Performance Profiling Harness"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pytest>=9.0.0",
+    "rich>=13.0.0",
+    "torch>=2.0.0"
+]
+
+[tool.setuptools]
+py-modules = ["otr_run", "storage", "reporter", "engine"]
+
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
