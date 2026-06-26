@@ -213,32 +213,28 @@ class OTRProfilerEngine:
                 vram_base = 0.0
 
             # Forward pass timer
-            timer_fwd = benchmark.Timer(
-                stmt="func(*inputs)",
-                globals={"func": func, "inputs": inputs},
-                num_threads=1,
-            )
-            forward_latency_ms = (
-                timer_fwd.blocked_autorange(min_run_time=0.5).median * 1000.0
-            )
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
+            t0 = time.perf_counter()
+            for _ in range(num_iter):
+                _ = func(*inputs)
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
+            forward_latency_ms = ((time.perf_counter() - t0) / num_iter) * 1000.0
 
             if not requires_bwd:
                 latency_ms = forward_latency_ms
                 backward_latency_ms = 0.0
             else:
                 # Combined forward and backward pass timer
-                timer_total = benchmark.Timer(
-                    stmt="fwd_bwd(func, inputs)",
-                    globals={
-                        "fwd_bwd": OTRProfilerEngine._fwd_bwd_wrapper,
-                        "func": func,
-                        "inputs": inputs,
-                    },
-                    num_threads=1,
-                )
-                latency_ms = (
-                    timer_total.blocked_autorange(min_run_time=0.5).median * 1000.0
-                )
+                if torch.cuda.is_available():
+                    torch.cuda.synchronize()
+                t0 = time.perf_counter()
+                for _ in range(num_iter):
+                    OTRProfilerEngine._fwd_bwd_wrapper(func, inputs)
+                if torch.cuda.is_available():
+                    torch.cuda.synchronize()
+                latency_ms = ((time.perf_counter() - t0) / num_iter) * 1000.0
                 backward_latency_ms = max(latency_ms - forward_latency_ms, 0.0)
 
             metrics.update(
@@ -292,13 +288,16 @@ class OTRProfilerEngine:
                 )
 
             # Low-Level PyTorch Operations Profiling (CPU / GPU bound ratio checks)
+            # Detect ROCm / HIP to avoid ProfilerActivity.CUDA hangs in key_averages()
+            is_hip = getattr(torch, "version", None) is not None and getattr(torch.version, "hip", None) is not None
             activities = [ProfilerActivity.CPU]
-            if torch.cuda.is_available():
+            if torch.cuda.is_available() and not is_hip:
                 activities.append(ProfilerActivity.CUDA)
 
             with profile(activities=activities, record_shapes=False) as prof:
                 with record_function("otr_target"):
-                    for _ in range(num_iter):
+                    profiler_iters = min(2, num_iter)
+                    for _ in range(profiler_iters):
                         if requires_bwd:
                             OTRProfilerEngine._fwd_bwd_wrapper(func, inputs)
                         else:
@@ -307,7 +306,7 @@ class OTRProfilerEngine:
                         torch.cuda.synchronize()
 
             averages = prof.key_averages()
-            if torch.cuda.is_available():
+            if torch.cuda.is_available() and not is_hip:
                 total_device_time = sum(
                     OTRProfilerEngine._get_device_time(op) for op in averages
                 )

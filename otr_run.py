@@ -134,6 +134,16 @@ def pytest_configure(config: Any) -> None:
     # Inject the host repository's test directory path to resolve custom configs natively
     sys.path.insert(0, os.path.abspath(test_dir))
 
+    # Apply global PyTorch compiler configurations
+    try:
+        import torch
+        torch._dynamo.config.force_parameter_static_shapes = False
+        torch._dynamo.config.recompile_limit = 64
+        if torch.cuda.is_available():
+            torch.set_float32_matmul_precision("high")
+    except ImportError:
+        pass
+
 
 def otr_bench(request: Any) -> Callable[..., Dict[str, Any]]:
     """
